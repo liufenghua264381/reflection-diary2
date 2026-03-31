@@ -1,0 +1,43 @@
+{
+  "name": "每日反思日记",
+  "short_name": "每日反思",
+  "description": "用七个问题，看清自己",
+  "start_url": "/reflection_diary.html",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#1a1a2e",
+  "orientation": "portrait-primary",
+  "lang": "zh-CN",
+  "categories": ["productivity", "lifestyle"],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "今日记录",
+      "short_name": "记录",
+      "description": "记录今天的反思",
+      "url": "/reflection_diary.html#today",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "本周汇总",
+      "short_name": "汇总",
+      "description": "查看本周汇总",
+      "url": "/reflection_diary.html#summary",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

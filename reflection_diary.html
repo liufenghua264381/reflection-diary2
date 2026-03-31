@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#3b82f6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="每日反思">
+    <title>每日反思日记</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;700&family=Caveat:wght@400;700&display=swap');
+        body { background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); color: #334155; font-family: 'Noto Serif SC', serif; min-height: 100vh; padding: 15px; overflow-x: hidden; }
+        .container { max-width: 900px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 25px; padding: 20px 0; border-bottom: 2px solid #e2e8f0; }
+        h1 { font-family: 'Caveat', cursive; font-size: 2.8em; font-weight: 700; color: #1d4ed8; margin-bottom: 8px; }
+        .subtitle { font-size: 0.9em; color: #64748b; font-style: italic; }
+        .install-banner { background: linear-gradient(135deg, #3b82f6 0%, #93c5fd 100%); color: #1a1a2e; padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; display: none; align-items: center; justify-content: space-between; }
+        .install-banner.show { display: flex; }
+        .install-banner-btn { background: #1a1a2e; color: #1d4ed8; border: none; padding: 10px 20px; border-radius: 6px; font-family: 'Noto Serif SC', serif; cursor: pointer; }
+        .tabs { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid rgba(232, 232, 232, 0.1); overflow-x: auto; }
+        .tab-btn { padding: 12px 20px; background: transparent; border: none; color: #64748b; cursor: pointer; font-size: 0.95em; font-family: 'Noto Serif SC', serif; border-bottom: 3px solid transparent; transition: all 0.3s; }
+        .tab-btn:hover { color: #1d4ed8; }
+        .tab-btn.active { color: #1d4ed8; border-bottom-color: #1d4ed8; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .form-section { background: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-radius: 12px; padding: 20px; margin-bottom: 15px; }
+        .section-title { font-size: 1.1em; color: #1d4ed8; font-weight: 500; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(59, 130, 246, 0.15); }
+        .question-group { margin-bottom: 20px; }
+        .question-label { display: flex; align-items: center; margin-bottom: 10px; font-size: 1em; color: #1d4ed8; font-weight: 500; }
+        .question-number { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: rgba(59, 130, 246, 0.15); border: 1px solid #3b82f6; border-radius: 50%; margin-right: 10px; font-size: 0.85em; }
+        textarea { width: 100%; min-height: 90px; padding: 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 8px; color: #334155; font-family: 'Noto Serif SC', serif; font-size: 1em; line-height: 1.6; resize: vertical; }
+        textarea:focus { outline: none; background: rgba(59, 130, 246, 0.05); border-color: #1d4ed8; }
+        .checkbox-group { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
+        .checkbox-item { display: flex; align-items: center; padding: 12px 15px; background: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-radius: 8px; cursor: pointer; transition: all 0.3s; }
+        .checkbox-item:hover { background: rgba(59, 130, 246, 0.1); }
+        .checkbox-item.checked { background: #dcfce7; border-color: #22c55e; }
+        .checkbox-item input { display: none; }
+        .checkbox-icon { width: 24px; height: 24px; border: 2px solid #cbd5e1; border-radius: 6px; margin-right: 12px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: transparent; }
+        .checkbox-item.checked .checkbox-icon { background: #28a745; border-color: #28a745; color: white; }
+        .checkbox-label { font-size: 0.95em; color: #334155; }
+        .rating-container { display: flex; gap: 8px; flex-wrap: wrap; }
+        .rating-btn { width: 40px; height: 40px; border: 2px solid rgba(59, 130, 246, 0.3); border-radius: 50%; background: rgba(255, 255, 255, 0.03); color: #64748b; font-size: 1em; font-family: 'Noto Serif SC', serif; cursor: pointer; }
+        .rating-btn:hover { background: rgba(59, 130, 246, 0.15); color: #1d4ed8; }
+        .rating-btn.active { background: linear-gradient(135deg, #3b82f6 0%, #93c5fd 100%); border-color: #1d4ed8; color: #1a1a2e; font-weight: 700; }
+        .rating-display { margin-top: 10px; font-size: 0.9em; color: #64748b; }
+        .rating-display span { color: #1d4ed8; font-weight: 700; font-size: 1.2em; }
+        .button-group { display: flex; gap: 10px; margin-top: 25px; }
+        button { padding: 14px 24px; border: none; border-radius: 8px; font-family: 'Noto Serif SC', serif; font-size: 1em; cursor: pointer; font-weight: 500; }
+        .btn-primary { background: linear-gradient(135deg, #3b82f6 0%, #93c5fd 100%); color: #1a1a2e; flex: 1; }
+        .btn-secondary { background: rgba(59, 130, 246, 0.1); color: #1d4ed8; border: 1px solid #3b82f6; }
+        .date-input { padding: 10px 15px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 8px; color: #334155; font-family: 'Noto Serif SC', serif; }
+        .summary-card { background: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-radius: 12px; padding: 18px; margin-bottom: 15px; }
+        .summary-date { font-size: 1.1em; color: #1d4ed8; font-weight: 500; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid rgba(59, 130, 246, 0.15); }
+        .summary-content { line-height: 1.7; color: #475569; }
+        .summary-content p { margin-bottom: 10px; font-size: 0.95em; }
+        .summary-content strong { color: #1d4ed8; }
+        .summary-habits { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+        .habit-tag { padding: 4px 12px; background: rgba(40, 167, 69, 0.2); border: 1px solid #28a745; border-radius: 20px; font-size: 0.85em; color: #90ee90; }
+        .habit-tag.incomplete { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.2); color: #94a3b8; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .stat-box { background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 10px; padding: 15px; text-align: center; }
+        .stat-number { font-size: 1.6em; color: #1d4ed8; font-weight: 700; }
+        .stat-label { font-size: 0.8em; color: #64748b; margin-top: 5px; }
+        .message { padding: 12px 16px; border-radius: 8px; margin-bottom: 15px; font-size: 0.95em; }
+        .message.success { background: rgba(40, 167, 69, 0.2); border: 1px solid #28a745; color: #90ee90; }
+        .message.error { background: rgba(220, 53, 69, 0.2); border: 1px solid #dc3545; color: #ff6b6b; }
+        .no-data { text-align: center; padding: 40px 20px; color: #64748b; font-style: italic; }
+        .quick-actions { display: flex; gap: 10px; margin-bottom: 15px; }
+        .quick-btn { flex: 1; min-width: 80px; padding: 12px 16px; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 8px; color: #1d4ed8; font-family: 'Noto Serif SC', serif; font-size: 0.9em; cursor: pointer; }
+        .offline-indicator { position: fixed; top: 10px; right: 10px; background: #ef4444; color: white; padding: 8px 15px; border-radius: 20px; font-size: 0.85em; display: none; z-index: 1000; }
+        .offline-indicator.show { display: block; }
+        @media (max-width: 768px) { body { padding: 12px; } h1 { font-size: 2.2em; } .form-section { padding: 15px; } .checkbox-group { grid-template-columns: 1fr; } .rating-btn { width: 36px; height: 36px; } }
+    </style>
+</head>
+<body>
+    <div id="offlineIndicator" class="offline-indicator">📴 离线模式</div>
+    <div class="container">
+        <header><h1>📔 每日反思</h1><p class="subtitle">用七个问题，看清自己</p></header>
+        <div id="installBanner" class="install-banner"><span>📱 收藏到主屏幕</span><button class="install-banner-btn" onclick="installApp()">安装</button></div>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('today')">📝 今日</button>
+            <button class="tab-btn" onclick="switchTab('summary')">📊 汇总</button>
+            <button class="tab-btn" onclick="switchTab('history')">📚 历史</button>
+        </div>
+        <div id="today" class="tab-content active">
+            <div id="message-container"></div>
+            <form id="reflectionForm">
+                <div class="form-section"><div style="display: flex; align-items: center; gap: 12px;"><label style="color: #1d4ed8; font-weight: 500;">📅 选择日期：</label><input type="date" id="entryDate" class="date-input"></div></div>
+                <div class="form-section">
+                    <div class="section-title">✅ 每日习惯</div>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item" onclick="toggleCheckbox(this,'exercise')"><input type="checkbox"><span class="checkbox-icon">✓</span><span class="checkbox-label">🏃 本日运动</span></label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this,'record')"><input type="checkbox"><span class="checkbox-icon">✓</span><span class="checkbox-label">📝 本日记录</span></label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this,'meditation')"><input type="checkbox"><span class="checkbox-icon">✓</span><span class="checkbox-label">🧘 本日打坐</span></label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this,'reading')"><input type="checkbox"><span class="checkbox-icon">✓</span><span class="checkbox-label">📚 本日读书</span></label>
+                    </div>
+                </div>
+                <div class="form-section">
+                    <div class="section-title">🍽️ 饮食控制满意度</div>
+                    <div class="rating-container" id="dietRating">
+                        <button type="button" class="rating-btn" onclick="setRating(1)">1</button><button type="button" class="rating-btn" onclick="setRating(2)">2</button><button type="button" class="rating-btn" onclick="setRating(3)">3</button><button type="button" class="rating-btn" onclick="setRating(4)">4</button><button type="button" class="rating-btn" onclick="setRating(5)">5</button><button type="button" class="rating-btn" onclick="setRating(6)">6</button><button type="button" class="rating-btn" onclick="setRating(7)">7</button><button type="button" class="rating-btn" onclick="setRating(8)">8</button><button type="button" class="rating-btn" onclick="setRating(9)">9</button><button type="button" class="rating-btn" onclick="setRating(10)">10</button>
+                    </div>
+                    <div class="rating-display">当前评分：<span id="dietScoreDisplay">-</span> / 10 分</div>
+                </div>
+                <div class="form-section">
+                    <div class="section-title">🤔 深层反思</div>
+                    <div class="question-group"><label class="question-label"><span class="question-number">1</span>你今天最起波澜的事情是什么</label><textarea name="q1" placeholder="描述这个事件..."></textarea></div>
+                    <div class="question-group"><label class="question-label"><span class="question-number">2</span>我的这个反映是什么？</label><textarea name="q2" placeholder="你的反应、情绪、想法..."></textarea></div>
+                    <div class="question-group"><label class="question-label"><span class="question-number">3</span>我其实是想得到什么？</label><textarea name="q3" placeholder="深层的需求或渴望..."></textarea></div>
+                    <div class="question-group"><label class="question-label"><span class="question-number">4</span>我其实是在害怕什么？</label><textarea name="q4" placeholder="潜在的恐惧或担忧..."></textarea></div>
+                    <div class="question-group"><label class="question-label"><span class="question-number">5</span>我自己给自己找了一个什么样的理由</label><textarea name="q5" placeholder="你给自己的借口或解释..."></textarea></div>
+                    <div class="question-group"><label class="question-label"><span class="question-number">6</span>今天捞起来的主石头是什么</label><textarea name="q6" placeholder="今天的核心收获或洞察..."></textarea></div>
+                    <div class="question-group"><label class="question-label"><span class="question-number">7</span>如果明天同样遇到一样的事情，我准备怎么选？</label><textarea name="q7" placeholder="你的改进计划或新选择..."></textarea></div>
+                </div>
+                <div class="form-section">
+                    <div class="section-title">💭 本日心得</div>
+                    <textarea name="dailyNote" placeholder="记录今天的感悟、心情或其他想法..." style="min-height: 120px;"></textarea>
+                </div>
+                <div class="button-group"><button type="submit" class="btn-primary">💾 保存记录</button><button type="button" class="btn-secondary" onclick="clearForm()">🔄 清空</button></div>
+            </form>
+        </div>
+        <div id="summary" class="tab-content">
+            <div class="form-section">
+                <div class="quick-actions"><button class="quick-btn" onclick="quickSummary('week')">📅 本周</button><button class="quick-btn" onclick="quickSummary('month')">📆 本月</button></div>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;"><label style="color: #1d4ed8; font-weight: 500; font-size: 0.9em;">汇总：</label><select id="summaryType" class="date-input" style="flex:1;min-width:120px;"><option value="week">本周汇总</option><option value="month">本月汇总</option><option value="custom">自定义范围</option></select><button onclick="generateSummary()" class="btn-primary">📊 生成</button></div>
+                <div id="customDateRange" style="display:none;margin-top:15px;"><div style="display:flex;gap:12px;flex-wrap:wrap;"><div><label style="color:#3b82f6;font-size:0.85em;">开始：</label><input type="date" id="startDate" class="date-input"></div><div><label style="color:#3b82f6;font-size:0.85em;">结束：</label><input type="date" id="endDate" class="date-input"></div></div></div>
+            </div>
+            <div id="summaryResult"></div>
+        </div>
+        <div id="history" class="tab-content">
+            <div class="form-section">
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 15px;"><label style="color: #1d4ed8; font-weight: 500; font-size: 0.9em;">🔍 查找：</label><input type="date" id="searchDate" class="date-input"><button onclick="searchHistory()" class="btn-primary">查询</button><button onclick="exportData()" class="btn-secondary">📥 导出</button></div>
+                <div class="quick-actions"><button class="quick-btn" onclick="showRecentHistory(7)">最近7天</button><button class="quick-btn" onclick="showRecentHistory(30)">最近30天</button></div>
+            </div>
+            <div id="historyResult"></div>
+        </div>
+    </div>
+    <script>
+        let currentData={habits:{exercise:false,record:false,meditation:false,reading:false},dietRating:0};
+        let deferredPrompt;
+        const installBanner=document.getElementById('installBanner');
+        window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;installBanner.classList.add('show');});
+        async function installApp(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt=null;}installBanner.classList.remove('show');}
+        function updateOnlineStatus(){document.getElementById('offlineIndicator').classList.toggle('show',!navigator.onLine);}
+        window.addEventListener('online',updateOnlineStatus);window.addEventListener('offline',updateOnlineStatus);updateOnlineStatus();
+        if('serviceWorker'in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});}
+        document.addEventListener('DOMContentLoaded',()=>{const today=new Date().toISOString().split('T')[0];document.getElementById('entryDate').value=today;loadTodayEntry();});
+        function switchTab(tabName){document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(el=>el.classList.remove('active'));document.getElementById(tabName).classList.add('active');event.target.classList.add('active');}
+        function toggleCheckbox(el,key){const cb=el.querySelector('input');cb.checked=!cb.checked;el.classList.toggle('checked',cb.checked);currentData.habits[key]=cb.checked;}
+        function setRating(v){currentData.dietRating=v;document.querySelectorAll('#dietRating .rating-btn').forEach((btn,i)=>btn.classList.toggle('active',i+1<=v));document.getElementById('dietScoreDisplay').textContent=v;}
+        function getAllEntries(){const d=localStorage.getItem('reflectionEntries');return d?JSON.parse(d):{};}
+        function saveEntry(date,data){const e=getAllEntries();e[date]=data;localStorage.setItem('reflectionEntries',JSON.stringify(e));}
+        function loadTodayEntry(){const date=document.getElementById('entryDate').value;const entry=getAllEntries()[date];if(entry){['exercise','record','meditation','reading'].forEach(k=>{const el=document.querySelector(`input[type="checkbox"]`).closest('.checkbox-item');const items=document.querySelectorAll('.checkbox-item');const idx={exercise:0,record:1,meditation:2,reading:3}[k];const item=items[idx];const cb=item.querySelector('input');cb.checked=entry.habits?.[k]||false;item.classList.toggle('checked',cb.checked);currentData.habits[k]=cb.checked;});setRating(entry.dietRating||0);const form=document.getElementById('reflectionForm');['q1','q2','q3','q4','q5','q6','q7'].forEach(q=>{form.querySelector(`textarea[name="${q}"]`).value=entry.questions?.[q]||'';});form.querySelector('textarea[name="dailyNote"]').value=entry.dailyNote||'';}else{resetForm();}}
+        function resetForm(){currentData={habits:{exercise:false,record:false,meditation:false,reading:false},dietRating:0};document.querySelectorAll('.checkbox-item').forEach(el=>{el.classList.remove('checked');el.querySelector('input').checked=false;});setRating(0);document.getElementById('reflectionForm').reset();}
+        function clearForm(){if(confirm('确定要清空所有内容吗？'))resetForm();}
+        document.getElementById('entryDate').addEventListener('change',loadTodayEntry);
+        document.getElementById('reflectionForm').addEventListener('submit',function(e){e.preventDefault();const date=document.getElementById('entryDate').value;const form=this;const data={habits:currentData.habits,dietRating:currentData.dietRating,questions:{q1:form.q1.value,q2:form.q2.value,q3:form.q3.value,q4:form.q4.value,q5:form.q5.value,q6:form.q6.value,q7:form.q7.value},dailyNote:form.dailyNote.value,timestamp:new Date().toISOString()};saveEntry(date,data);showMessage('✨ 已保存！','success');});
+        function showMessage(t,type){const c=document.getElementById('message-container');c.innerHTML=`<div class="message ${type}">${t}</div>`;setTimeout(()=>c.innerHTML='',3000);}
+        document.getElementById('summaryType').addEventListener('change',function(){document.getElementById('customDateRange').style.display=this.value==='custom'?'block':'none';});
+        function quickSummary(t){document.getElementById('summaryType').value=t;generateSummary();}
+        function generateSummary(){const type=document.getElementById('summaryType').value;const entries=getAllEntries();const today=new Date();let sd,ed;if(type==='week'){const d=today.getDay();sd=new Date(today);sd.setDate(today.getDate()-d);ed=new Date(sd);ed.setDate(sd.getDate()+6);}else if(type==='month'){sd=new Date(today.getFullYear(),today.getMonth(),1);ed=new Date(today.getFullYear(),today.getMonth()+1,0);}else{sd=new Date(document.getElementById('startDate').value);ed=new Date(document.getElementById('endDate').value);}const se=Object.entries(entries).filter(([d])=>{const dt=new Date(d);return dt>=sd&&dt<=ed;}).sort((a,b)=>new Date(b[0])-new Date(a[0]));if(se.length===0){document.getElementById('summaryResult').innerHTML='<div class="no-data">该时间段内没有记录</div>';return;}const hs={exercise:0,record:0,meditation:0,reading:0};let tdr=0,drc=0;se.forEach(([,d])=>{Object.keys(hs).forEach(k=>{if(d.habits?.[k])hs[k]++;});if(d.dietRating){tdr+=d.dietRating;drc++;}});const adr=drc>0?(tdr/drc).toFixed(1):'-';let html=`<div class="stats"><div class="stat-box"><div class="stat-number">${se.length}</div><div class="stat-label">记录天数</div></div><div class="stat-box"><div class="stat-number">${hs.exercise}</div><div class="stat-label">🏃 运动</div></div><div class="stat-box"><div class="stat-number">${hs.meditation}</div><div class="stat-label">🧘 打坐</div></div><div class="stat-box"><div class="stat-number">${hs.reading}</div><div class="stat-label">📚 读书</div></div><div class="stat-box"><div class="stat-number">${adr}</div><div class="stat-label">🍽️ 平均分</div></div></div>`;se.forEach(([date,d])=>{const hab=[];if(d.habits?.exercise)hab.push('🏃 运动');if(d.habits?.record)hab.push('📝 记录');if(d.habits?.meditation)hab.push('🧘 打坐');if(d.habits?.reading)hab.push('📚 读书');html+=`<div class="summary-card"><div class="summary-date">${formatDate(date)}</div><div class="summary-habits">${hab.length>0?hab.map(h=>`<span class="habit-tag">${h}</span>`).join(''):'<span class="habit-tag incomplete">无习惯完成</span>'}</div>${d.dietRating?`<p style="margin-bottom:10px;"><strong>🍽️ 饮食评分：</strong>${d.dietRating}/10 分</p>`:''}<div class="summary-content"><p><strong>事件：</strong> ${d.questions?.q1||'未记录'}</p><p><strong>收获：</strong> ${d.questions?.q6||'未记录'}</p>${d.dailyNote?`<p><strong>心得：</strong> ${d.dailyNote}</p>`:''}</div></div>`;});document.getElementById('summaryResult').innerHTML=html;}
+        function searchHistory(){const date=document.getElementById('searchDate').value;if(!date){showMessage('请选择日期','error');return;}const entry=getAllEntries()[date];if(!entry){document.getElementById('historyResult').innerHTML='<div class="no-data">该日期没有记录</div>';return;}const hab=[];if(entry.habits?.exercise)hab.push('🏃 运动');if(entry.habits?.record)hab.push('📝 记录');if(entry.habits?.meditation)hab.push('🧘 打坐');if(entry.habits?.reading)hab.push('📚 读书');const html=`<div class="summary-card"><div class="summary-date">${formatDate(date)}</div><div class="summary-habits">${hab.length>0?hab.map(h=>`<span class="habit-tag">${h}</span>`).join(''):'<span class="habit-tag incomplete">无习惯完成</span>'}</div>${entry.dietRating?`<p style="margin-bottom:10px;"><strong>🍽️ 饮食评分：</strong>${entry.dietRating}/10 分</p>`:''}<div class="summary-content"><p><strong>1. 最起波澜的事情：</strong> ${entry.questions?.q1||'未记录'}</p><p><strong>2. 我的反应：</strong> ${entry.questions?.q2||'未记录'}</p><p><strong>3. 想得到什么：</strong> ${entry.questions?.q3||'未记录'}</p><p><strong>4. 害怕什么：</strong> ${entry.questions?.q4||'未记录'}</p><p><strong>5. 给自己的理由：</strong> ${entry.questions?.q5||'未记录'}</p><p><strong>6. 主石头：</strong> ${entry.questions?.q6||'未记录'}</p><p><strong>7. 明天的选择：</strong> ${entry.questions?.q7||'未记录'}</p>${entry.dailyNote?`<p><strong>💭 心得：</strong> ${entry.dailyNote}</p>`:''}</div></div>`;document.getElementById('historyResult').innerHTML=html;}
+        function showRecentHistory(days){const entries=getAllEntries();const cutoff=new Date();cutoff.setDate(cutoff.getDate()-days);const filtered=Object.entries(entries).filter(([d])=>new Date(d)>=cutoff).sort((a,b)=>new Date(b[0])-new Date(a[0]));if(filtered.length===0){document.getElementById('historyResult').innerHTML=`<div class="no-data">最近${days}天没有记录</div>`;return;}let html=`<div class="stats"><div class="stat-box"><div class="stat-number">${filtered.length}</div><div class="stat-label">最近${days}天</div></div></div>`;filtered.forEach(([date,d])=>{const hab=[];if(d.habits?.exercise)hab.push('🏃');if(d.habits?.meditation)hab.push('🧘');if(d.habits?.reading)hab.push('📚');html+=`<div class="summary-card"><div class="summary-date">${formatDate(date)} ${hab.join(' ')}</div>${d.dietRating?`<p><strong>🍽️ 饮食评分：</strong>${d.dietRating}/10</p>`:''}<div class="summary-content"><p><strong>事件：</strong> ${d.questions?.q1||'未记录'}</p><p><strong>收获：</strong> ${d.questions?.q6||'未记录'}</p>${d.dailyNote?`<p><strong>心得：</strong> ${d.dailyNote}</p>`:''}</div></div>`;});document.getElementById('historyResult').innerHTML=html;}
+        function exportData(){const entries=getAllEntries();if(Object.keys(entries).length===0){showMessage('没有数据可导出','error');return;}let csv='\uFEFF日期,运动,记录,打坐,读书,饮食评分,问题1,问题2,问题3,问题4,问题5,问题6,问题7,心得\n';Object.entries(entries).sort((a,b)=>new Date(b[0])-new Date(a[0])).forEach(([d,e])=>{csv+=`${d},${e.habits?.exercise?1:0},${e.habits?.record?1:0},${e.habits?.meditation?1:0},${e.habits?.reading?1:0},${e.dietRating||0},"${(e.questions?.q1||'').replace(/"/g,'""')}","${(e.questions?.q2||'').replace(/"/g,'""')}","${(e.questions?.q3||'').replace(/"/g,'""')}","${(e.questions?.q4||'').replace(/"/g,'""')}","${(e.questions?.q5||'').replace(/"/g,'""')}","${(e.questions?.q6||'').replace(/"/g,'""')}","${(e.questions?.q7||'').replace(/"/g,'""')}","${(e.dailyNote||'').replace(/"/g,'""')}"\n`;});const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});const link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download=`反思日记_${new Date().toISOString().split('T')[0]}.csv`;link.click();showMessage('✨ 已导出','success');}
+        function formatDate(ds){const d=new Date(ds+'T00:00:00');return d.toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric',weekday:'long'});}
+    </script>
+</body>
+</html>
